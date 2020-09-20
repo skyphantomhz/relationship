@@ -2,13 +2,51 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:relationship/constants.dart';
-import 'package:relationship/screens/home/couple_profile.dart';
+import 'package:relationship/model/person.dart';
+import 'package:relationship/screens/home/components/couple_profile.dart';
+import 'package:relationship/screens/home/components/text_dialog.dart';
+import 'package:relationship/screens/home/couple_relationship_bloc.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+
+  DateTime fallInLoveDate = DateTime.now();
+  String unit = "days";
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  CoupleRelationshipBloc _coupleBloc = CoupleRelationshipBloc();
+  ProfileCallback myProfileCallback;
+  ProfileCallback partnerProfileCallback;
+
+  @override
+  void initState() {
+    _coupleBloc = CoupleRelationshipBloc();
+
+    myProfileCallback = ProfileCallback(
+        onEditName: (Future<String> name) {
+          _coupleBloc.updateMyName(name);
+        },
+        onEditDob: (Future<DateTime> dob) {
+          _coupleBloc.updateMyDob(dob);
+        },
+        onEditAvatar: (Future<String> avatar) {},
+        context: context);
+
+    partnerProfileCallback = ProfileCallback(
+        onEditName: (Future<String> name) {},
+        onEditDob: (Future<DateTime> dob) {},
+        onEditAvatar: (Future<String> avatar) {},
+        context: context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    context = context;
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
@@ -37,16 +75,31 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("60",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline2
-                          .copyWith(color: kTextSufaceColor)),
-                  Text("Days",
+                  Text("fall in love",
                       style: Theme.of(context)
                           .textTheme
                           .headline6
-                          .copyWith(color: kTextSufaceColor))
+                          .copyWith(color: kTextSufaceColor)),
+                  InkWell(
+                    onTap: () {
+                      showDateDialog(context, DateTime.now());
+                    },
+                    child: Text(getFallInLoveDays(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline2
+                            .copyWith(color: kTextSufaceColor)),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      showTextDialog(context, "Textinput", widget.unit);
+                    },
+                    child: Text(widget.unit,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: kTextSufaceColor)),
+                  )
                 ],
               ),
             ),
@@ -60,19 +113,27 @@ class HomeScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                      child: CoupleProfile(
-                          avatarUrl: "assets/images/monster_male_face.jpg",
-                          name: "Shusui",
-                          gender: "Male",
-                          age: "24",
-                          zodiac: "Taurus")),
+                      child: StreamBuilder<Person>(
+                          stream: _coupleBloc.me,
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null)
+                              return Container();
+                            else
+                              return CoupleProfile(
+                                  person: snapshot.data,
+                                  callback: myProfileCallback);
+                          })),
                   Expanded(
-                      child: CoupleProfile(
-                          avatarUrl: "assets/images/monster_female_face.jpg",
-                          name: "Olinn",
-                          gender: "Female",
-                          age: "24",
-                          zodiac: "Taurus")),
+                      child: StreamBuilder<Object>(
+                          stream: _coupleBloc.partner,
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null)
+                              return Container();
+                            else
+                              return CoupleProfile(
+                                  person: snapshot.data,
+                                  callback: partnerProfileCallback);
+                          })),
                 ],
               ),
             ),
@@ -81,4 +142,50 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+
+  
+
+  void showTextDialog(
+      BuildContext context, String title, String textInput) async {
+    final unit = await showDialog(
+        child: TextDialog(textInput, title: title), context: context);
+    setState(() {
+      if (unit != null) {
+        widget.unit = unit;
+      }
+    });
+  }
+
+  Future<DateTime> showDateDialog(
+      BuildContext context, DateTime initialDate) async {
+    final current = DateTime.now();
+    return showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: DateTime(1990),
+        lastDate: current);
+  }
+
+  String getFallInLoveDays() {
+    return DateTime.now().difference(widget.fallInLoveDate).inDays.toString();
+  }
+
+  @override
+  void dispose() {
+    _coupleBloc.dispose();
+    super.dispose();
+  }
+}
+
+typedef OnEditName = void Function(Future<String> name);
+typedef OnEditDob = void Function(Future<DateTime> dob);
+typedef OnEditAvatar = void Function(Future<String> avatar);
+
+class ProfileCallback {
+  OnEditName onEditName;
+  OnEditDob onEditDob;
+  OnEditAvatar onEditAvatar;
+  BuildContext context;
+  ProfileCallback(
+      {this.onEditName, this.onEditDob, this.onEditAvatar, this.context});
 }

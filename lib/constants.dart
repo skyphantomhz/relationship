@@ -9,3 +9,5 @@ const kBackgroundColor = Color(0xFFF9F8FD);
 const kSufaceColor = Color(0xFFFFFFFF);
 
 const double kDefaultPadding = 20.0;
+const double kContentPadding = 8.0;
+const double kDefaultRounded = 20.0;
