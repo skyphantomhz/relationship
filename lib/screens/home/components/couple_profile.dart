@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:relationship/constants.dart';
+import 'package:relationship/model/gender.dart';
 import 'package:relationship/model/person.dart';
 import 'package:relationship/extensions/zodiacExt.dart';
 import 'package:relationship/extensions/genderExt.dart';
@@ -53,12 +54,12 @@ class CoupleProfile extends StatelessWidget {
                           textBaseline: TextBaseline.alphabetic),
                       children: [
                         WidgetSpan(
-                            child: SvgPicture.asset(
-                          "assets/images/${person.gender.inString.toLowerCase()}.svg",
-                          width: 14,
-                          height: 14,
-                          color: kTextColor,
-                        )),
+                          child: Icon(
+                            person.gender.icon,
+                            size: 14,
+                            color: kTextColor,
+                          ),
+                        ),
                         WidgetSpan(child: SizedBox(width: 8)),
                         TextSpan(text: person.age ?? '')
                       ]),
@@ -108,11 +109,15 @@ class CoupleProfile extends StatelessWidget {
                 new ListTile(
                     leading: new Icon(FontAwesomeIcons.transgenderAlt),
                     title: new Text('Gender'),
-                    onTap: () => {}),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showModalGenderBottomSheet(context);
+                    }),
                 new ListTile(
                   leading: new Icon(FontAwesomeIcons.calendar),
                   title: new Text('Date of birth'),
                   onTap: () {
+                    Navigator.pop(context);
                     final dobFuture = showDateDialog(context, person.birthday);
                     callback.onEditDob(dobFuture);
                   },
@@ -123,25 +128,24 @@ class CoupleProfile extends StatelessWidget {
         });
   }
 
-  void _showGendarOption(context) {
+  void _showModalGenderBottomSheet(context) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
-          return Container(
-            child: new Wrap(
-              children: <Widget>[
-                new ListTile(
-                    leading: new Icon(FontAwesomeIcons.transgenderAlt),
-                    title: new Text('Gender'),
-                    onTap: () => {}),
-                new ListTile(
-                  leading: new Icon(FontAwesomeIcons.calendar),
-                  title: new Text('Date of birth'),
-                  onTap: () => {},
-                ),
-              ],
-            ),
-          );
+          return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: Gender.values
+                  .map<Widget>((item) => ListTile(
+                      leading: Icon(
+                        item.icon,
+                        color: kTextSufaceColor,
+                      ),
+                      title: Text(item.inString),
+                      onTap: () {
+                        Navigator.pop(context);
+                        callback.onEditGender(Future.value(item));
+                      }))
+                  .toList());
         });
   }
 

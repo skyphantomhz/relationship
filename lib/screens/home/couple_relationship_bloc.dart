@@ -11,7 +11,7 @@ class CoupleRelationshipBloc extends Bloc {
       dateOfBirth: 830710800000));
   Stream<Person> get me => _me.stream;
 
-  Subject<Person> _partner = new BehaviorSubject.seeded(Person(
+  BehaviorSubject<Person> _partner = new BehaviorSubject.seeded(Person(
       avatarUrl: "assets/images/monster_female_face.jpg",
       name: "Olinn",
       gender: Gender.Female,
@@ -34,5 +34,29 @@ class CoupleRelationshipBloc extends Bloc {
     final cloneMyProfile = _me.value;
     cloneMyProfile.dob = await dobFuture;
     _me.sink.add(cloneMyProfile);
+  }
+
+  void updateMyGender(Future<Gender> gender) async {
+    final cloneMyProfile = _me.value;
+    cloneMyProfile.gender = await gender;
+    _me.sink.add(cloneMyProfile);
+  }
+
+  void updatePartnerName(Future<String> nameFuture) async {
+    final clonePartnerProfile = _partner.value;
+    clonePartnerProfile.name = await nameFuture;
+    _me.sink.add(clonePartnerProfile);
+  }
+
+  void updatePartnerDob(Future<DateTime> dobFuture) async {
+    final clonePartnerProfile = _partner.value;
+    clonePartnerProfile.dob = await dobFuture;
+    _me.sink.add(clonePartnerProfile);
+  }
+
+  void updatePartnerGender(Future<Gender> gender) async {
+    final clonePartnerProfile = _partner.value;
+    clonePartnerProfile.gender = await gender;
+    _me.sink.add(clonePartnerProfile);
   }
 }

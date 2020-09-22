@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:relationship/constants.dart';
+import 'package:relationship/model/gender.dart';
 import 'package:relationship/model/person.dart';
 import 'package:relationship/screens/home/components/couple_profile.dart';
 import 'package:relationship/screens/home/components/text_dialog.dart';
@@ -34,12 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
           _coupleBloc.updateMyDob(dob);
         },
         onEditAvatar: (Future<String> avatar) {},
+        onEditGender: (Future<Gender> gender) {
+          _coupleBloc.updateMyGender(gender);
+        },
         context: context);
 
     partnerProfileCallback = ProfileCallback(
         onEditName: (Future<String> name) {},
         onEditDob: (Future<DateTime> dob) {},
         onEditAvatar: (Future<String> avatar) {},
+        onEditGender: (Future<Gender> gender) {},
         context: context);
     super.initState();
   }
@@ -143,8 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
-
   void showTextDialog(
       BuildContext context, String title, String textInput) async {
     final unit = await showDialog(
@@ -180,12 +183,18 @@ class _HomeScreenState extends State<HomeScreen> {
 typedef OnEditName = void Function(Future<String> name);
 typedef OnEditDob = void Function(Future<DateTime> dob);
 typedef OnEditAvatar = void Function(Future<String> avatar);
+typedef OnEditGender = void Function(Future<Gender> gender);
 
 class ProfileCallback {
   OnEditName onEditName;
   OnEditDob onEditDob;
   OnEditAvatar onEditAvatar;
+  OnEditGender onEditGender;
   BuildContext context;
   ProfileCallback(
-      {this.onEditName, this.onEditDob, this.onEditAvatar, this.context});
+      {this.onEditName,
+      this.onEditDob,
+      this.onEditAvatar,
+      this.onEditGender,
+      this.context});
 }
