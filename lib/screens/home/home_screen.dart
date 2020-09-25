@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:relationship/constants.dart';
 import 'package:relationship/model/gender.dart';
 import 'package:relationship/model/person.dart';
+import 'package:relationship/model/relationship.dart';
 import 'package:relationship/screens/home/components/couple_profile.dart';
 import 'package:relationship/screens/home/components/text_dialog.dart';
 import 'package:relationship/screens/home/couple_relationship_bloc.dart';
@@ -13,9 +14,6 @@ class HomeScreen extends StatefulWidget {
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
-
-  DateTime fallInLoveDate = DateTime.now();
-  String unit = "days";
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -41,10 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context);
 
     partnerProfileCallback = ProfileCallback(
-        onEditName: (Future<String> name) {},
-        onEditDob: (Future<DateTime> dob) {},
+        onEditName: (Future<String> name) {
+          _coupleBloc.updatePartnerName(name);
+        },
+        onEditDob: (Future<DateTime> dob) {
+          _coupleBloc.updatePartnerDob(dob);
+        },
         onEditAvatar: (Future<String> avatar) {},
-        onEditGender: (Future<Gender> gender) {},
+        onEditGender: (Future<Gender> gender) {
+          _coupleBloc.updatePartnerGender(gender);
+        },
         context: context);
     super.initState();
   }
@@ -77,36 +81,56 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: kSufaceColor,
                 shape: BoxShape.circle,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("fall in love",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline6
-                          .copyWith(color: kTextSufaceColor)),
-                  InkWell(
-                    onTap: () {
-                      showDateDialog(context, DateTime.now());
-                    },
-                    child: Text(getFallInLoveDays(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline2
-                            .copyWith(color: kTextSufaceColor)),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      showTextDialog(context, "Textinput", widget.unit);
-                    },
-                    child: Text(widget.unit,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6
-                            .copyWith(color: kTextSufaceColor)),
-                  )
-                ],
-              ),
+              child: StreamBuilder<RelationShip>(
+                  stream: _coupleBloc.relationShip,
+                  builder: (context, snapshot) {
+                    final relationShip = snapshot.data;
+                    final startRelationShip =
+                        relationShip?.startInDate ?? DateTime.now();
+                    final unit = relationShip?.unit ?? "days";
+                    final title = relationShip?.title ?? "Fall in love";
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            final titleFuture =
+                                showTextDialog(context, "Text input", title);
+                            _coupleBloc.updateTitle(titleFuture);
+                          },
+                          child: Text(title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: kTextSufaceColor)),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            final startDate =
+                                showDateDialog(context, startRelationShip);
+                            _coupleBloc.updateStartRelationShip(startDate);
+                          },
+                          child: Text(getFallInLoveDays(startRelationShip),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline2
+                                  .copyWith(color: kTextSufaceColor)),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            final unitFuture =
+                                showTextDialog(context, "Text input", unit);
+                            _coupleBloc.updateUnit(unitFuture);
+                          },
+                          child: Text(unit,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: kTextSufaceColor)),
+                        )
+                      ],
+                    );
+                  }),
             ),
           ),
           Positioned(
@@ -148,15 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void showTextDialog(
+  Future<String> showTextDialog(
       BuildContext context, String title, String textInput) async {
-    final unit = await showDialog(
+    return showDialog(
         child: TextDialog(textInput, title: title), context: context);
-    setState(() {
-      if (unit != null) {
-        widget.unit = unit;
-      }
-    });
   }
 
   Future<DateTime> showDateDialog(
@@ -169,8 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
         lastDate: current);
   }
 
-  String getFallInLoveDays() {
-    return DateTime.now().difference(widget.fallInLoveDate).inDays.toString();
+  String getFallInLoveDays(DateTime startRelationShip) {
+    return DateTime.now().difference(startRelationShip).inDays.toString();
   }
 
   @override
