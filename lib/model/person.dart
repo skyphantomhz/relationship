@@ -6,6 +6,13 @@ import 'package:relationship/extensions/dateTimeExt.dart';
 import 'package:relationship/extensions/zodiacExt.dart';
 
 class Person extends ChangeNotifier {
+
+  static String name;
+  int _dob;
+  Gender gender;
+  String avatarUrl;
+
+  int id;
   String name;
   int _dob;
   Gender gender;
@@ -46,5 +53,23 @@ class Person extends ChangeNotifier {
       age--;
     }
     return age.toString();
+  }
+
+   Person.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    iDob = json['_dob'];
+    gender = json['gender'];
+    avatarUrl = json['avatarUrl'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['_dob'] = this.iDob;
+    data['gender'] = this.gender;
+    data['avatarUrl'] = this.avatarUrl;
+    return data;
   }
 }

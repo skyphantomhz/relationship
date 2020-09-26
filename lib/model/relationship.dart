@@ -30,20 +30,31 @@ class RelationShip extends ChangeNotifier {
     }
   }
 
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{
-      RelationShip.columnTitle: title,
-      columnDone: done == true ? 1 : 0
-    };
-    if (id != null) {
-      map[columnId] = id;
+  RelationShip.fromJson(Map<String, dynamic> json) {
+    id = json[columnId];
+    title = json[columnTitle];
+    startDate = json[columnStartDate];
+    unit = json[columnUnit];
+    isCouple = json[columnIsCouple] == 1;
+    if (json[columnPersons] != null) {
+      persons = new List<Person>();
+      json['persons'].forEach((v) {
+        persons.add(new Person.fromJson(v));
+      });
     }
-    return map;
   }
 
-  Todo.fromMap(Map<String, dynamic> map) {
-    id = map[columnId];
-    title = map[columnTitle];
-    done = map[columnDone] == 1;
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data[columnId] = this.id;
+    data[columnTitle] = this.title;
+    data[columnStartDate] = this.startDate;
+    data[columnUnit] = this.unit;
+    data[columnIsCouple] = this.isCouple == true ? 1 : 0;
+    if (this.persons != null) {
+      data[columnPersons] = this.persons.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
+}
 }
