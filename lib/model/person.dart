@@ -4,13 +4,17 @@ import 'package:relationship/model/zodiac.dart';
 import 'package:relationship/extensions/intExt.dart';
 import 'package:relationship/extensions/dateTimeExt.dart';
 import 'package:relationship/extensions/zodiacExt.dart';
+import 'package:relationship/extensions/genderExt.dart';
+import 'package:relationship/extensions/stringExt.dart';
 
 class Person extends ChangeNotifier {
 
-  static String name;
-  int _dob;
-  Gender gender;
-  String avatarUrl;
+  static String tablePerson = "person";
+  static String columnId = "_id";
+  static String columnName = "name";
+  static String columnDob = "dob";
+  static String columnGender = "gender";
+  static String columnAvatarUrl = "avatarUrl";
 
   int id;
   String name;
@@ -56,20 +60,20 @@ class Person extends ChangeNotifier {
   }
 
    Person.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    iDob = json['_dob'];
-    gender = json['gender'];
-    avatarUrl = json['avatarUrl'];
+    id = json[columnId];
+    name = json[columnName];
+    setDob(json[columnDob]);
+    gender = json[columnGender].toString().gender;
+    avatarUrl = json[columnAvatarUrl];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['_dob'] = this.iDob;
-    data['gender'] = this.gender;
-    data['avatarUrl'] = this.avatarUrl;
+    data[columnId] = this.id;
+    data[columnName] = this.name;
+    data[columnDob] = this._dob;
+    data[columnGender] = this.gender.inString;
+    data[columnAvatarUrl] = this.avatarUrl;
     return data;
   }
 }

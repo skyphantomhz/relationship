@@ -57,4 +57,3 @@ class RelationShip extends ChangeNotifier {
     return data;
   }
 }
-}

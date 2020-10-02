@@ -99,4 +99,8 @@ class CoupleRelationshipBloc extends Bloc {
     cloneRelationShip.title = await titleFuture;
     _relationShip.add(cloneRelationShip);
   }
+
+  void _saveRelationShip(RelationShip relationShip){
+
+  }
 }
