@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:relationship/constants.dart';
 import 'package:relationship/model/gender.dart';
 import 'package:relationship/model/person.dart';
@@ -32,7 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onEditDob: (Future<DateTime> dob) {
           _coupleBloc.updateMyDob(dob);
         },
-        onEditAvatar: (Future<String> avatar) {},
+        onEditAvatar: (Future<PickedFile> avatar) {
+          _coupleBloc.updateMyAvatar(avatar);
+        },
         onEditGender: (Future<Gender> gender) {
           _coupleBloc.updateMyGender(gender);
         },
@@ -45,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onEditDob: (Future<DateTime> dob) {
           _coupleBloc.updatePartnerDob(dob);
         },
-        onEditAvatar: (Future<String> avatar) {},
+        onEditAvatar: (Future<PickedFile> avatar) {},
         onEditGender: (Future<Gender> gender) {
           _coupleBloc.updatePartnerGender(gender);
         },
@@ -201,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 typedef OnEditName = void Function(Future<String> name);
 typedef OnEditDob = void Function(Future<DateTime> dob);
-typedef OnEditAvatar = void Function(Future<String> avatar);
+typedef OnEditAvatar = void Function(Future<PickedFile> avatar);
 typedef OnEditGender = void Function(Future<Gender> gender);
 
 class ProfileCallback {

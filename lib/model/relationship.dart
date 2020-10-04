@@ -1,10 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:relationship/model/person.dart';
 
-
-
 class RelationShip extends ChangeNotifier {
-
   static String tableRelationShip = 'relationship';
   static String columnId = '_id';
   static String columnTitle = 'title';
@@ -12,6 +12,9 @@ class RelationShip extends ChangeNotifier {
   static String columnUnit = 'unit';
   static String columnIsCouple = 'isCouple';
   static String columnPersons = 'persons';
+
+  final JsonDecoder _jsonDecoder = GetIt.I<JsonDecoder>();
+  final JsonEncoder _jsonEncoder = GetIt.I<JsonEncoder>();
 
   int id;
   String title;
@@ -37,8 +40,9 @@ class RelationShip extends ChangeNotifier {
     unit = json[columnUnit];
     isCouple = json[columnIsCouple] == 1;
     if (json[columnPersons] != null) {
+      final personsConverted = _jsonDecoder.convert(json['persons']);
       persons = new List<Person>();
-      json['persons'].forEach((v) {
+      personsConverted.forEach((v) {
         persons.add(new Person.fromJson(v));
       });
     }
@@ -52,7 +56,7 @@ class RelationShip extends ChangeNotifier {
     data[columnUnit] = this.unit;
     data[columnIsCouple] = this.isCouple == true ? 1 : 0;
     if (this.persons != null) {
-      data[columnPersons] = this.persons.map((v) => v.toJson()).toList();
+      data[columnPersons] = _jsonEncoder.convert(persons);
     }
     return data;
   }

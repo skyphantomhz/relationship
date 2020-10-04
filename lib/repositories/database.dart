@@ -1,11 +1,15 @@
+import 'package:path/path.dart';
 import 'package:relationship/model/relationship.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseProvider {
-  Database db;
+  static Database _db;
 
-  Future open(String path) async {
-    db = await openDatabase(path, version: 1,
+  static Future<Database> open() async {
+    if (_db != null) return _db;
+    final databasesPath  = await getDatabasesPath();
+    var path = join(databasesPath, 'data.db');
+    _db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       await db.execute('''
       create table ${RelationShip.tableRelationShip} ( 
@@ -14,36 +18,13 @@ class DatabaseProvider {
           ${RelationShip.columnStartDate} integer not null,
           ${RelationShip.columnUnit} text not null,
           ${RelationShip.columnIsCouple} integer not null,
-          ${RelationShip.columnPersons} text not null)s
+          ${RelationShip.columnPersons} text not null)
       ''');
     });
+    return _db;
   }
 
-  Future<RelationShip> insert(RelationShip relationShip) async {
-    await db.insert(RelationShip.tableRelationShip, relationShip.toJson());
-    return relationShip;
-  }
+  static Database get database => _db;
 
-  Future<RelationShip> getRelationShip() async {
-    List<Map> maps = await db.query(RelationShip.tableRelationShip, columns: [
-      RelationShip.columnId,
-      RelationShip.columnTitle,
-      RelationShip.columnStartDate,
-      RelationShip.columnUnit,
-      RelationShip.columnIsCouple,
-      RelationShip.columnPersons
-    ]);
-    if (maps.length > 0) {
-      return RelationShip.fromJson(maps.first);
-    }
-    return null;
-  }
-
-  Future<int> update(RelationShip relationShip) async {
-    return await db.update(
-        RelationShip.tableRelationShip, relationShip.toJson(),
-        where: '${RelationShip.columnId} = ?', whereArgs: [relationShip.id]);
-  }
-
-  Future close() async => db.close();
+  static Future close() async => _db.close();
 }

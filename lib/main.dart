@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:relationship/provider/locator.dart';
 import 'package:relationship/screens/home/home_screen.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  setupLocator();
+  return runApp(MyApp());
+} 
 
 class MyApp extends StatelessWidget {
   @override

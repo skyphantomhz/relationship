@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:relationship/constants.dart';
 import 'package:relationship/model/gender.dart';
 import 'package:relationship/model/person.dart';
@@ -20,9 +21,14 @@ class CoupleProfile extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        CircleAvatar(
-          backgroundImage: AssetImage(person.avatarUrl ?? ''),
-          radius: 70,
+        InkWell(
+          onTap: () {
+            callback.onEditAvatar(pickImage());
+          },
+          child: CircleAvatar(
+            backgroundImage: AssetImage(person.avatarUrl ?? ''),
+            radius: 70,
+          ),
         ),
         Padding(
           padding: EdgeInsets.all(8),
@@ -153,6 +159,10 @@ class CoupleProfile extends StatelessWidget {
       BuildContext context, String title, String textInput) async {
     return showDialog(
         child: TextDialog(textInput, title: title), context: context);
+  }
+
+  Future<PickedFile> pickImage() async {
+    return ImagePicker().getImage(source: ImageSource.gallery);
   }
 
   Future<DateTime> showDateDialog(
