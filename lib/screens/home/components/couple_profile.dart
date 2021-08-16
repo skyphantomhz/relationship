@@ -158,7 +158,8 @@ class CoupleProfile extends StatelessWidget {
   Future<String> updateTextDialog(
       BuildContext context, String title, String textInput) async {
     return showDialog(
-        child: TextDialog(textInput, title: title), context: context);
+        builder: (context) => TextDialog(textInput, title: title),
+        context: context);
   }
 
   Future<PickedFile> pickImage() async {

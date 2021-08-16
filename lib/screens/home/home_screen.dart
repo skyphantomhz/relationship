@@ -178,7 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<String> showTextDialog(
       BuildContext context, String title, String textInput) async {
     return showDialog(
-        child: TextDialog(textInput, title: title), context: context);
+        builder: (context) => TextDialog(textInput, title: title),
+        context: context);
   }
 
   Future<DateTime> showDateDialog(
